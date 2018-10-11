@@ -16,6 +16,15 @@ class GlobalAveragePool(nn.Module):
         # h: (_, c)
         return h
 
+class ELU1(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.elu = nn.ELU(inplace=True)
+
+    def forward(self, x):
+        h = self.elu(x) + 1
+        return h
+
 class cSELayer(nn.Module):
     
     def __init__(self, channels):
@@ -24,7 +33,7 @@ class cSELayer(nn.Module):
         self.cse_path = nn.Sequential(
             GlobalAveragePool(),
             nn.Linear(channels, channels//2, bias=False),
-            nn.ReLU(inplace=True),
+            ELU1(),
             nn.Linear(channels//2, channels, bias=False),
             nn.Sigmoid()
         )
