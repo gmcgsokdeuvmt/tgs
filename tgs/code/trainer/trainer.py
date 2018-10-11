@@ -64,7 +64,7 @@ class Trainer:
         for epoch in range(epoch_num):
             t = time.time()
 
-            aug_train_set = self.train_dataset.postsample_pair_parallel()
+            aug_train_set = self.train_dataset.postsample_pair_parallel(aug=True)
 
             train_loader = aug_train_set.get_loader(batch_size=batch_size,shuffle=True,drop_last=True)
             val_loader   = self.val_dataset.get_loader(batch_size=batch_size,shuffle=False,drop_last=False)

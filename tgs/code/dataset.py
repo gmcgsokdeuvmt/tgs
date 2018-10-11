@@ -163,11 +163,11 @@ class Dataset(torch.utils.data.Dataset):
         new_set.post_sample_func = self.post_sample_func
         return new_set
 
-    def postsample_pair_parallel(self):
+    def postsample_pair_parallel(self,aug=False):
         new_images = []
         new_masks  = []
         new_records = Parallel(n_jobs= -1)\
-            (delayed(self.post_sample_func)(self[idx]) for idx in range(len(self.images)))
+            (delayed(self.post_sample_func)(self[idx],aug=aug) for idx in range(len(self.images)))
 
         for idx in range(len(self.images)):
             image, mask = new_records[idx]
