@@ -13,7 +13,7 @@ class GlobalAveragePool(nn.Module):
         # Global Average Pooling
         b, c, _, _ = x.size()
         h = self.avg_pool(x).view(b, c)
-        
+
         # h: (_, c)
         return h
 
@@ -73,7 +73,7 @@ class scSELayer(nn.Module):
     def forward(self, x):
         hcse = self.cse_layer(x)
         hsse = self.sse_layer(x)
-        h = torch.max(hcse, hsse)
+        h = hcse + hsse
         return h
         
     
