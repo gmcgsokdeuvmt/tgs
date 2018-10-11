@@ -23,9 +23,9 @@ class cSELayer(nn.Module):
 
         self.cse_path = nn.Sequential(
             GlobalAveragePool(),
-            nn.Linear(channels, channels//2),
+            nn.Linear(channels, channels//2, bias=False),
             nn.ReLU(inplace=True),
-            nn.Linear(channels//2, channels),
+            nn.Linear(channels//2, channels, bias=False),
             nn.Sigmoid()
         )
 
@@ -43,7 +43,7 @@ class sSELayer(nn.Module):
         super().__init__()
 
         self.sse_path = nn.Sequential(
-            nn.Conv2d(channels,  1, kernel_size=1, padding=0),
+            nn.Conv2d(channels,  1, kernel_size=1, padding=0, bias=False),
             nn.Sigmoid()            
         )
 

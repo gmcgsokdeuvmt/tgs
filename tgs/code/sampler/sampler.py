@@ -68,9 +68,6 @@ def pre_sample_pair(inputs):
     inputs = resize202_pair(inputs)
     return inputs
 
-def aug_sample_pair(inputs):
-    return inputs
-
 def post_sample_pair(inputs,aug=False):
     if aug:
         inputs = train_augment(inputs)
