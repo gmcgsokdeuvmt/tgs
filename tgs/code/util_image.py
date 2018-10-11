@@ -80,7 +80,9 @@ def do_center_pad_to_factor(image, factor=32):
 
     image = cv2.copyMakeBorder(image, dy0, dy1, dx0, dx1, cv2.BORDER_REFLECT_101)
                             #cv2.BORDER_CONSTANT, 0)
-    return image[:,:,np.newaxis]
+    if len(image.shape) == 2:
+        image = image[:,:,np.newaxis]
+    return image
 
 def do_repad_randomly2(image, mask, H, W, factor=32): # (c,h,w)
 
