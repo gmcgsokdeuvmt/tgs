@@ -64,8 +64,10 @@ class Trainer:
         for epoch in range(epoch_num):
             t = time.time()
 
-            train_loader = self.train_dataset.get_loader(batch_size=batch_size,shuffle=True,drop_last=True)
-            val_loader = self.val_dataset.get_loader(batch_size=batch_size,shuffle=False,drop_last=False)
+            aug_train_set = self.train_dataset.postsample_pair_parallel()
+
+            train_loader = aug_train_set.get_loader(batch_size=batch_size,shuffle=True,drop_last=True)
+            val_loader   = self.val_dataset.get_loader(batch_size=batch_size,shuffle=False,drop_last=False)
             
             train_loss, train_acc = self.epoch_train(model, train_loader)
             val_loss, val_acc = self.epoch_val(model, val_loader)

@@ -24,7 +24,10 @@ def load_images(dir,suffix='.png',img_dtype=np.uint8,return_ids=False,offset=Non
     images = [ imread(fname=img_path,as_gray=True) for _, img_path in image_paths ]
     if img_dtype == np.uint8:
         images = np.asarray(images,dtype=np.float32)/255.
-        images = images[:,:,:,:1]
+        if len(images.shape) == 3:
+            images = images[:,:,:,np.newaxis]
+        else:
+            images = images[:,:,:,:1]
     elif img_dtype == np.uint16:
         images = np.asarray(images,dtype=np.float32)/65535.
         images = images[:,:,:,np.newaxis]

@@ -19,7 +19,8 @@ class Dataset(torch.utils.data.Dataset):
         self.image_ids = None
         self.mask_ids = None
         self.suffix = '.png'
-        self.sample_func = sampler.sample
+        self.pre_sample_func  = sampler.pre_sample_pair
+        self.post_sample_func = sampler.post_sample_pair
 
     def __len__(self):
         return len(self.images)
@@ -29,8 +30,6 @@ class Dataset(torch.utils.data.Dataset):
             e[idx]
             for e in [self.images, self.masks] if e is not None
         ]
-
-        #record = self.sample_func(record)
 
         return record
 
@@ -74,12 +73,14 @@ class Dataset(torch.utils.data.Dataset):
         train_set = Dataset(images=images_train,masks=masks_train)
         train_set.image_ids = image_ids_train
         train_set.mask_ids = mask_ids_train
-        train_set.sample_func = sampler.sample_train
+        train_set.pre_sample_func  = sampler.pre_sample_pair
+        train_set.post_sample_func = sampler.post_sample_pair
 
         val_set = Dataset(images= images_test,masks=masks_test)
         val_set.image_ids = image_ids_test
         val_set.mask_ids = mask_ids_test
-        val_set.sample_func = sampler.sample_val
+        val_set.pre_sample_func  = sampler.pre_sample_pair
+        val_set.post_sample_func = sampler.post_sample_pair
 
         return train_set, val_set
 
@@ -102,7 +103,7 @@ class Dataset(torch.utils.data.Dataset):
         for idx in range(len(self.images)):
             record = self[idx]
             
-            image, mask = self.sample_func(record)
+            image, mask = self.pre_sample_func(record)
             
             new_images.append(image)
             new_masks.append(mask)
@@ -110,14 +111,15 @@ class Dataset(torch.utils.data.Dataset):
         new_set = Dataset(images=new_images,masks=new_masks)
         new_set.image_ids = self.image_ids
         new_set.mask_ids = self.mask_ids
-        new_set.sample_func = self.sample_func
+        new_set.pre_sample_func  = self.pre_sample_func
+        new_set.post_sample_func = self.post_sample_func
         return new_set
 
     def presample_pair_parallel(self):
         new_images = []
         new_masks  = []
         new_records = Parallel(n_jobs= -1)\
-            (delayed(self.sample_func)(self[idx]) for idx in range(len(self.images)))
+            (delayed(self.pre_sample_func)(self[idx]) for idx in range(len(self.images)))
 
         for idx in range(len(self.images)):
             image, mask = new_records[idx]
@@ -127,7 +129,8 @@ class Dataset(torch.utils.data.Dataset):
         new_set = Dataset(images=new_images,masks=new_masks)
         new_set.image_ids = self.image_ids
         new_set.mask_ids = self.mask_ids
-        new_set.sample_func = self.sample_func
+        new_set.pre_sample_func  = self.pre_sample_func
+        new_set.post_sample_func = self.post_sample_func
         return new_set
 
     def presample_image(self):
@@ -135,19 +138,20 @@ class Dataset(torch.utils.data.Dataset):
         for idx in range(len(self.images)):
             record = self[idx]
             
-            image = self.sample_func(record)
+            image = self.pre_sample_func(record)
             
             new_images.append(image)
         
         new_set = Dataset(images=new_images)
         new_set.image_ids = self.image_ids
-        new_set.sample_func = self.sample_func
+        new_set.pre_sample_func  = self.pre_sample_func
+        new_set.post_sample_func = self.post_sample_func
         return new_set
     
     def presample_image_parallel(self):
         new_images = []
         new_records = Parallel(n_jobs= -1)\
-            (delayed(self.sample_func)(self[idx]) for idx in range(len(self.images)))
+            (delayed(self.pre_sample_func)(self[idx]) for idx in range(len(self.images)))
 
         for idx in range(len(self.images)):
             image = new_records[idx]
@@ -155,6 +159,24 @@ class Dataset(torch.utils.data.Dataset):
         
         new_set = Dataset(images=new_images)
         new_set.image_ids = self.image_ids
-        new_set.sample_func = self.sample_func
+        new_set.pre_sample_func  = self.pre_sample_func
+        new_set.post_sample_func = self.post_sample_func
         return new_set
-    
+
+    def postsample_pair_parallel(self):
+        new_images = []
+        new_masks  = []
+        new_records = Parallel(n_jobs= -1)\
+            (delayed(self.post_sample_func)(self[idx]) for idx in range(len(self.images)))
+
+        for idx in range(len(self.images)):
+            image, mask = new_records[idx]
+            new_images.append(image)
+            new_masks.append(mask)
+        
+        new_set = Dataset(images=new_images,masks=new_masks)
+        new_set.image_ids = self.image_ids
+        new_set.mask_ids = self.mask_ids
+        new_set.pre_sample_func  = self.pre_sample_func
+        new_set.post_sample_func = self.post_sample_func
+        return new_set
