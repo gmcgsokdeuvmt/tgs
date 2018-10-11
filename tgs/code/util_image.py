@@ -30,7 +30,7 @@ def load_images(dir,suffix='.png',img_dtype=np.uint8,return_ids=False,offset=Non
         image_paths = search_images(dir,suffix)
     else:
         image_paths = search_images(dir,suffix)[offset:(offset+size)]
-    images = [ imread(fname=img_path,as_gray=True) for _, img_path in image_paths ]
+    images = [ imread(fname=img_path) for _, img_path in image_paths ]
     if img_dtype == np.uint8:
         images = np.asarray(images,dtype=np.float32)/255.
         if len(images.shape) == 3:
