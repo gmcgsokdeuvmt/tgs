@@ -6,13 +6,14 @@ import numpy as np
 class GlobalAveragePool(nn.Module):
     def __init__(self):
         super().__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
 
     def forward(self, x):
         # x: (_, c, h, w)
         # Global Average Pooling
-        s = x.size()
-        h = torch.mean(x.view(s[0],s[1],-1),2)
-
+        b, c, _, _ = x.size()
+        h = self.avg_pool(x).view(b, c)
+        
         # h: (_, c)
         return h
 
@@ -41,8 +42,8 @@ class cSELayer(nn.Module):
     def forward(self, x):
         h = self.cse_path(x)
 
-        h = h.unsqueeze(2)
-        h = h.unsqueeze(3)
+        s = h.size()
+        h = h.view(s[0],s[1],1,1)
         hx = h * x
         return hx
 
