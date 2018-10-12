@@ -95,6 +95,8 @@ class Dataset(torch.utils.data.Dataset):
         new_set = Dataset(images=new_images,masks=new_masks)
         new_set.image_ids = ids
         new_set.mask_ids = ids
+        new_set.pre_sample_func  = self.pre_sample_func
+        new_set.post_sample_func = self.post_sample_func
         return new_set
     
     def presample_pair(self):
