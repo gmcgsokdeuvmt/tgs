@@ -23,7 +23,6 @@ class SERes34Unet(nn.Module):
         out_e4 = config['out_encoder4']
         out_e3 = config['out_encoder3']
         out_e2 = config['out_encoder2']
-        out_e1 = config['out_encoder1']
 
         out_d5 = config['out_decoder5']
         out_d4 = config['out_decoder4']
@@ -32,8 +31,7 @@ class SERes34Unet(nn.Module):
         out_d1 = config['out_decoder1']
 
         self.encoder1 = nn.Sequential(
-            resunet.encoder1,
-            se_layer.scSELayer(out_e1)
+            resunet.encoder1
         )
         self.encoder2 = nn.Sequential(
             resunet.encoder2,
