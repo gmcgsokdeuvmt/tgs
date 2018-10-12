@@ -79,6 +79,7 @@ def post_sample_pair(inputs,aug=False):
     inputs = hwc2chw_pair(inputs)
     return inputs
 
+"""
 def train_augment(inputs):
     image, mask = inputs
     if np.random.rand() < 0.5:
@@ -105,3 +106,35 @@ def train_augment(inputs):
             image = util_image.do_gamma(image,np.random.uniform(1-0.05,1+0.05))
 
     return image,mask
+"""
+
+def train_augment(inputs):
+    image, mask = inputs
+    if np.random.rand() < 0.5:
+         image, mask = util_image.do_horizontal_flip2(image, mask)
+
+    if np.random.rand() < 0.5:
+        c = np.random.choice(4)
+        if c==0:
+            image, mask = util_image.do_random_shift_scale_crop_pad2(image, mask, 0.2) #0.125
+
+        if c==1:
+            image, mask = util_image.do_horizontal_shear2( image, mask, dx=np.random.uniform(-0.07,0.07) )
+
+        if c==2:
+            image, mask = util_image.do_shift_scale_rotate2( image, mask, dx=0, dy=0, scale=1, angle=np.random.uniform(0,15))  #10
+
+        if c==3:
+            image, mask = util_image.do_elastic_transform2(image, mask, grid=10, distort=np.random.uniform(0,0.15))#0.10
+
+
+    if np.random.rand() < 0.5:
+        c = np.random.choice(3)
+        if c==0:
+            image = util_image.do_brightness_shift(image,np.random.uniform(-0.1,+0.1))
+        if c==1:
+            image = util_image.do_brightness_multiply(image,np.random.uniform(1-0.08,1+0.08))
+        if c==2:
+            image = util_image.do_gamma(image,np.random.uniform(1-0.08,1+0.08))
+        # if c==1:
+        #     image = do_invert_intensity(image)
