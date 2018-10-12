@@ -22,10 +22,10 @@ class Trainer:
         self.checkpoints   = 'ch{}.pth'
         self.log_filename  = 'train.log'
 
-    def epoch_train(self,model,train_loader):
+    def epoch_train(self,model,train_loader,actual_batch_rate=1):
         losses = []
         accs = []
-
+    
         for i, batch in enumerate(train_loader):
             input_x, input_t = batch
 
@@ -37,9 +37,11 @@ class Trainer:
             losses.append(total_loss.data.clone())
             accs.append(eval_result['accuracy'])
             
-            self.optimizer.zero_grad()
+            if (i % actual_batch_rate) == 0:
+                self.optimizer.zero_grad()
             total_loss.backward()
-            self.optimizer.step()
+            if (i % actual_batch_rate) == (actual_batch_rate - 1):
+                self.optimizer.step()
 
         loss =  np.mean(losses)
         acc = np.mean(accs)
@@ -64,7 +66,7 @@ class Trainer:
         acc = np.mean(accs)
         return loss, acc
 
-    def train(self,model,epoch_num,batch_size=16):
+    def train(self,model,epoch_num,batch_size=16,actual_batch_rate=1):
         model.cuda()
         for epoch in range(epoch_num):
             t = time.time()
@@ -74,7 +76,7 @@ class Trainer:
             train_loader = aug_train_set.get_loader(batch_size=batch_size,shuffle=True,drop_last=True)
             val_loader   = self.val_dataset.get_loader(batch_size=batch_size,shuffle=False,drop_last=False)
             
-            train_loss, train_acc = self.epoch_train(model, train_loader)
+            train_loss, train_acc = self.epoch_train(model, train_loader, actual_batch_rate)
             val_loss, val_acc = self.epoch_val(model, val_loader)
 
             print('Epoch {} is done! ({}s)'.format(epoch, time.time()-t))
