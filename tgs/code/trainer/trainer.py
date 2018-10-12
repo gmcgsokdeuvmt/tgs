@@ -16,9 +16,10 @@ class Trainer:
     def __init__(self,train_dataset,val_dataset,
                 optimizer):
         self.train_dataset = train_dataset
-        self.val_dataset = val_dataset
-        self.optimizer   = optimizer
-        self.checkpoints = 'ch{}.pth'
+        self.val_dataset   = val_dataset
+        self.optimizer     = optimizer
+        self.checkpoints   = 'ch{}.pth'
+        self.log_filename  = 'train.log'
 
     def epoch_train(self,model,train_loader):
         losses = []
@@ -82,5 +83,17 @@ class Trainer:
             save_path = self.checkpoints.format(epoch)
             torch.save(model.state_dict(), save_path)
             print('  Save model: {}'.format(save_path))
+
+            print(
+                epoch,
+                '{:.4g}'.format(train_loss),
+                '{:.4g}'.format(val_loss),                
+                '{:.4g}'.format(train_acc),
+                '{:.4g}'.format(val_acc),
+                sep=",", 
+                end="\n", 
+                file=codecs.open(self.log_filename, 'w', 'utf-8'), 
+                flush=True
+            )
             
         
