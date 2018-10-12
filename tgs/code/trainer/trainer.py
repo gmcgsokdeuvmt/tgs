@@ -92,7 +92,7 @@ class Trainer:
                 '{:.4g}'.format(val_acc),
                 sep=",", 
                 end="\n", 
-                file=codecs.open(self.log_filename, 'w', 'utf-8'), 
+                file=codecs.open(self.log_filename, 'a+', 'utf-8'), 
                 flush=True
             )
             
