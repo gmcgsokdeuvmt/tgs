@@ -138,3 +138,5 @@ def train_augment(inputs):
             image = util_image.do_gamma(image,np.random.uniform(1-0.08,1+0.08))
         # if c==1:
         #     image = do_invert_intensity(image)
+    
+    return image, mask
