@@ -34,7 +34,7 @@ class cSELayer(nn.Module):
         self.cse_path = nn.Sequential(
             GlobalAveragePool(),
             nn.Linear(channels, channels//2, bias=False),
-            ELU1(),
+            nn.ReLU(inplace=True),
             nn.Linear(channels//2, channels, bias=False),
             nn.Sigmoid()
         )
