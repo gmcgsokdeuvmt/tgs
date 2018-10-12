@@ -18,6 +18,7 @@ class Trainer:
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
         self.optimizer   = optimizer
+        self.checkpoints = 'ch{}.pth'
 
     def epoch_train(self,model,train_loader):
         losses = []
@@ -78,7 +79,8 @@ class Trainer:
             print('Epoch: {}. \t Train Loss: {:.4g}. \t Val Loss: {:.4g}'.format(epoch, train_loss, val_loss))
             print('Epoch: {}. \t Train Acc : {:.4g}. \t Val Acc : {:.4g}'.format(epoch, train_acc, val_acc))
             gc.collect()
-            torch.save(model.state_dict(), 'ch{}.pth'.format(epoch))
-            print('  Save model: ch{}.pth'.format(epoch))
+            save_path = self.checkpoints.format(epoch)
+            torch.save(model.state_dict(), save_path)
+            print('  Save model: {}'.format(save_path))
             
         
