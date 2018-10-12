@@ -10,6 +10,8 @@ from trainer import config_trainer
 evaluator = config_trainer.evaluator
 
 from sampler import sampler
+import gc
+
 class Trainer:
     def __init__(self,train_dataset,val_dataset,
                 optimizer):
@@ -75,5 +77,8 @@ class Trainer:
             print('Epoch {} is done! ({}s)'.format(epoch, time.time()-t))
             print('Epoch: {}. \t Train Loss: {:.4g}. \t Val Loss: {:.4g}'.format(epoch, train_loss, val_loss))
             print('Epoch: {}. \t Train Acc : {:.4g}. \t Val Acc : {:.4g}'.format(epoch, train_acc, val_acc))
-
+            gc.collect()
+            torch.save(model.state_dict(), 'ch{}.pth'.format(epoch))
+            print('  Save model: ch{}.pth'.format(epoch))
+            
         
