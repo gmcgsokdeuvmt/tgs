@@ -11,6 +11,7 @@ evaluator = config_trainer.evaluator
 
 from sampler import sampler
 import gc
+import codecs
 
 class Trainer:
     def __init__(self,train_dataset,val_dataset,
