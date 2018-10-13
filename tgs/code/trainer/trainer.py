@@ -12,6 +12,7 @@ evaluator = config_trainer.evaluator
 from sampler import sampler
 import gc
 import codecs
+import util_scheduler
 
 class Trainer:
     def __init__(self,train_dataset,val_dataset,
@@ -20,6 +21,7 @@ class Trainer:
         self.val_dataset   = val_dataset
         self.optimizer     = optimizer
         self.checkpoints   = 'ch{}.pth'
+        self.best_checkpoints   = 'best_ch{}.pth'
         self.log_filename  = 'train.log'
 
     def epoch_train(self,model,train_loader,actual_batch_rate=1):
@@ -66,8 +68,11 @@ class Trainer:
         acc = np.mean(accs)
         return loss, acc
 
-    def train(self,model,epoch_num,batch_size=16,actual_batch_rate=1):
+    def train(self,model,epoch_num,batch_size=16,actual_batch_rate=1,is_scheduler=False):
         model.cuda()
+        checkBestModel    = util_scheduler.CheckBestModel()
+        earlyStopping     = util_scheduler.EarlyStopping(patience=16)
+        reduceLROnPlateau = util_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.5, patience=8)
         for epoch in range(epoch_num):
             t = time.time()
 
@@ -79,6 +84,11 @@ class Trainer:
             train_loss, train_acc = self.epoch_train(model, train_loader, actual_batch_rate)
             val_loss, val_acc = self.epoch_val(model, val_loader)
 
+            lr = None
+            for i, param_group in enumerate(self.optimizer.param_groups):
+                lr = float(param_group['lr'])
+                break
+
             print('Epoch {} is done! ({}s)'.format(epoch, time.time()-t))
             print('Epoch: {}. \t Train Loss: {:.4g}. \t Val Loss: {:.4g}'.format(epoch, train_loss, val_loss))
             print('Epoch: {}. \t Train Acc : {:.4g}. \t Val Acc : {:.4g}'.format(epoch, train_acc, val_acc))
@@ -89,6 +99,7 @@ class Trainer:
 
             print(
                 epoch,
+                '{:.4g}'.format(lr),
                 '{:.4g}'.format(train_loss),
                 '{:.4g}'.format(val_loss),                
                 '{:.4g}'.format(train_acc),
@@ -98,5 +109,21 @@ class Trainer:
                 file=codecs.open(self.log_filename, 'a+', 'utf-8'), 
                 flush=True
             )
+
+            if is_scheduler:
+                save_best_path = self.best_checkpoints.format(epoch)
+                if checkBestModel.step(val_acc):
+                    print('  Save Best model: {}'.format(save_best_path))
+
+                if earlyStopping.step(val_loss):
+                    print('  Early Stopping!')
+                    break
+                reduceLROnPlateau.step(val_loss)
+            else:
+                save_best_path = self.best_checkpoints.format(epoch)
+                if checkBestModel.step(val_acc):
+                    print('  Save Best model: {}'.format(save_best_path))
+
+    
             
         
