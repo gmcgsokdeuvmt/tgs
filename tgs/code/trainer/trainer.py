@@ -69,11 +69,12 @@ class Trainer:
         acc = np.mean(accs)
         return loss, acc
 
-    def train(self,model,epoch_num,batch_size=16,actual_batch_rate=1,is_scheduler=False):
+    def train(self,model,epoch_num,batch_size=16,actual_batch_rate=1,is_scheduler=False,cyclic_scheduler=False):
         model.cuda()
         checkBestModel    = util_scheduler.CheckBestModel()
         earlyStopping     = util_scheduler.EarlyStopping(patience=16)
         reduceLROnPlateau = util_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.5, patience=8)
+        cosineAnnealingLR = util_scheduler.CosineAnnealingLR(self.optimizer, T_max=50, eta_min=0.001)
         for epoch in range(epoch_num):
             t = time.time()
 
@@ -111,21 +112,21 @@ class Trainer:
                 flush=True
             )
 
-            if is_scheduler:
-                save_best_path = self.best_checkpoints.format(epoch)
-                if checkBestModel.step(val_acc):
-                    torch.save(model.state_dict(), save_best_path)
-                    print('  Save Best model: {}'.format(save_best_path))
+            
+            save_best_path = self.best_checkpoints.format(epoch)
+            if checkBestModel.step(val_acc):
+                torch.save(model.state_dict(), save_best_path)
+                print('  Save Best model: {}'.format(save_best_path))
 
+            if is_scheduler:
                 if earlyStopping.step(val_loss):
                     print('  Early Stopping!')
                     break
                 reduceLROnPlateau.step(val_loss)
-            else:
-                save_best_path = self.best_checkpoints.format(epoch)
-                if checkBestModel.step(val_acc):
-                    torch.save(model.state_dict(), save_best_path)
-                    print('  Save Best model: {}'.format(save_best_path))
+
+            if cyclic_scheduler:
+                cosineAnnealingLR.step()
+
 
     
             
