@@ -7,7 +7,7 @@ from skimage import filters
 import time
 
 from trainer import config_trainer
-evaluator = config_trainer.evaluator
+evaluators = config_trainer.evaluators
 
 from sampler import sampler
 import gc
@@ -16,13 +16,14 @@ import util_scheduler
 
 class Trainer:
     def __init__(self,train_dataset,val_dataset,
-                optimizer):
+                optimizer,eval_type='focal'):
         self.train_dataset = train_dataset
         self.val_dataset   = val_dataset
         self.optimizer     = optimizer
         self.checkpoints   = 'ch{}.pth'
         self.best_checkpoints   = 'best_ch{}.pth'
         self.log_filename  = 'train.log'
+        self.evaluator     = evaluators[eval_type]
 
     def epoch_train(self,model,train_loader,actual_batch_rate=1):
         losses = []
@@ -34,8 +35,8 @@ class Trainer:
             input_x = Variable(input_x.cuda())
             input_t = Variable(input_t.cuda())
 
-            eval_result = evaluator.evaluate(model, input_x, input_t)
-            total_loss  = evaluator.calc_total_loss(eval_result)
+            eval_result = self.evaluator.evaluate(model, input_x, input_t)
+            total_loss  = self.evaluator.calc_total_loss(eval_result)
             losses.append(total_loss.data.clone())
             accs.append(eval_result['accuracy'])
             
@@ -59,8 +60,8 @@ class Trainer:
             input_x = Variable(input_x.cuda())
             input_t = Variable(input_t.cuda())
 
-            eval_result = evaluator.evaluate(model, input_x, input_t)
-            total_loss  = evaluator.calc_total_loss(eval_result)
+            eval_result = self.evaluator.evaluate(model, input_x, input_t)
+            total_loss  = self.evaluator.calc_total_loss(eval_result)
             losses.append(total_loss.data.clone())
             accs.append(eval_result['accuracy'])
 

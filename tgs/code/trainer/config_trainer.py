@@ -1,7 +1,9 @@
 from evaluator import evaluator_focal, evaluator_lovasz
 
-evaluator = evaluator_focal
-#evaluator = evaluator_lovasz
+evaluators = {
+    'focal': evaluator_focal,
+    'lovasz': evaluator_lovasz
+}
 
 config_log = [
     'epoch',
