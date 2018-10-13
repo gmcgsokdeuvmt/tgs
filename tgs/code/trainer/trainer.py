@@ -114,6 +114,7 @@ class Trainer:
             if is_scheduler:
                 save_best_path = self.best_checkpoints.format(epoch)
                 if checkBestModel.step(val_acc):
+                    torch.save(model.state_dict(), save_best_path)
                     print('  Save Best model: {}'.format(save_best_path))
 
                 if earlyStopping.step(val_loss):
