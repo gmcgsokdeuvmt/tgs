@@ -83,7 +83,9 @@ class Trainer:
             train_loader = aug_train_set.get_loader(batch_size=batch_size,shuffle=True,drop_last=True)
             val_loader   = self.val_dataset.get_loader(batch_size=batch_size,shuffle=False,drop_last=False)
             
+            model.train()
             train_loss, train_acc = self.epoch_train(model, train_loader, actual_batch_rate)
+            model.eval()
             val_loss, val_acc = self.epoch_val(model, val_loader)
 
             lr = None
