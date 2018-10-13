@@ -39,7 +39,7 @@ class Trainer:
             
             if (i % actual_batch_rate) == 0:
                 self.optimizer.zero_grad()
-            total_loss.backward()
+            (total_loss/actual_batch_rate).backward()
             if (i % actual_batch_rate) == (actual_batch_rate - 1):
                 self.optimizer.step()
 
