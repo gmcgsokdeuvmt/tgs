@@ -44,9 +44,18 @@ def resize202_pair(inputs):
     t = util_image.resize(t,(202,202,1),mode='reflect', preserve_range=True)
     return x, t
 
+def resize202(inputs):
+    x = inputs
+    x = util_image.resize(x,(202,202,1),mode='reflect', preserve_range=True)
+    return x
+
 def pad256_pair(inputs):
     x, t = inputs
     return util_image.do_center_pad_to_factor2(x, t, factor=64)
+
+def pad256(inputs):
+    x = inputs
+    return util_image.do_center_pad_to_factor(x, factor=64)
 
 def repeatx3(x):
     return np.concatenate([x.copy(),x.copy(),x.copy()],axis=2)
@@ -77,6 +86,19 @@ def post_sample_pair(inputs,aug=False):
     x = add_depth_channels(x)
     inputs = (x, t)
     inputs = hwc2chw_pair(inputs)
+    return inputs
+
+def pre_sample_image(inputs):
+    inputs = resize202(inputs[0])
+    return inputs
+
+def post_sample_image(inputs):
+    inputs = pad256(inputs[0])
+    x = inputs
+    x = repeatx3(x)
+    x = add_depth_channels(x)
+    inputs = x
+    inputs = hwc2chw(inputs)
     return inputs
 
 """

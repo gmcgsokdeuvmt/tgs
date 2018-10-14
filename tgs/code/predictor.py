@@ -62,7 +62,7 @@ class Predictor:
             self.true_masks = dataset.masks
             if mode=='pad':
                 H, W = 202, 202
-                dy0, dy1, dx0, dx1 = util_image.compute_center_pad(H,W)
+                dy0, dy1, dx0, dx1 = util_image.compute_center_pad(H,W,factor=64)
                 self.true_masks = [mask[:,dy0:(dy0+H),dx0:(dx0+W)].copy() for mask in self.true_masks]
                 self.true_masks = [cv2.resize(mask[0,:,:], dsize=(101,101))[np.newaxis,:,:]  for mask in self.true_masks]
                 # self.true_masks = [util_image.resize(mask, (1,101,101), mode='reflect', preserve_range=True)  for mask in self.true_masks]
@@ -79,7 +79,7 @@ class Predictor:
                 pred = pred.cpu().data.numpy()
                 if mode=='pad':
                     H, W = 202, 202
-                    dy0, dy1, dx0, dx1 = util_image.compute_center_pad(H,W)
+                    dy0, dy1, dx0, dx1 = util_image.compute_center_pad(H,W,factor=64)
                     pred = pred[:,dy0:(dy0+H),dx0:(dx0+W)].copy()
                     pred = cv2.resize(pred[0,:,:], dsize=(101,101))[np.newaxis,:,:]
                     #pred = util_image.resize(pred, (1,101,101), mode='reflect', preserve_range=True)
