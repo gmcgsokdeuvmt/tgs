@@ -5,6 +5,7 @@ import dataset
 from skimage import img_as_uint, io
 import os
 import util_image
+import cv2
 
 def calc_iou(y_true, y_hat):
     intersect = np.logical_and(y_true, y_hat).sum()
@@ -63,7 +64,9 @@ class Predictor:
                 H, W = 202, 202
                 dy0, dy1, dx0, dx1 = util_image.compute_center_pad(H,W)
                 self.true_masks = [mask[:,dy0:(dy0+H),dx0:(dx0+W)].copy() for mask in self.true_masks]
-                self.true_masks = [util_image.resize(mask, (1,101,101), mode='reflect', preserve_range=True)  for mask in self.true_masks]
+                self.true_masks = [cv2.resize(mask[0,:,:], dsize=(101,101))[np.newaxis,:,:]  for mask in self.true_masks]
+                # self.true_masks = [util_image.resize(mask, (1,101,101), mode='reflect', preserve_range=True)  for mask in self.true_masks]
+                
 
         preds = []
         for images in data_loader:
@@ -78,7 +81,9 @@ class Predictor:
                     H, W = 202, 202
                     dy0, dy1, dx0, dx1 = util_image.compute_center_pad(H,W)
                     pred = pred[:,dy0:(dy0+H),dx0:(dx0+W)].copy()
-                    pred = util_image.resize(pred, (1,101,101), mode='reflect', preserve_range=True)
+                    pred = cv2.resize(pred[0,:,:], dsize=(101,101))[np.newaxis,:,:]
+                    #pred = util_image.resize(pred, (1,101,101), mode='reflect', preserve_range=True)
+
                 preds.append(pred)
         
 
