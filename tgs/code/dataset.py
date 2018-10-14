@@ -151,9 +151,26 @@ class Dataset(torch.utils.data.Dataset):
         return new_set
     
     def presample_image_parallel(self):
+        self.pre_sample_func = sampler.pre_sample_image
         new_images = []
         new_records = Parallel(n_jobs= -1)\
             (delayed(self.pre_sample_func)(self[idx]) for idx in range(len(self.images)))
+
+        for idx in range(len(self.images)):
+            image = new_records[idx]
+            new_images.append(image)
+        
+        new_set = Dataset(images=new_images)
+        new_set.image_ids = self.image_ids
+        new_set.pre_sample_func  = self.pre_sample_func
+        new_set.post_sample_func = self.post_sample_func
+        return new_set
+
+    def postsample_image_parallel(self):
+        self.post_sample_func = sampler.post_sample_image
+        new_images = []
+        new_records = Parallel(n_jobs= -1)\
+            (delayed(self.post_sample_func)(self[idx]) for idx in range(len(self.images)))
 
         for idx in range(len(self.images)):
             image = new_records[idx]

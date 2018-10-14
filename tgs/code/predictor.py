@@ -67,8 +67,7 @@ class Predictor:
 
         preds = []
         for images in data_loader:
-            if has_mask: #dataset return (images, masks)
-                images = images[0]
+            images = images[0]
 
             batch_preds = self.___predict_core(images, predict_half=predict_half)
 
