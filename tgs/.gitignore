@@ -1,3 +1,4 @@
 tgs/code/*.pth
 tgs/code/*.pyc
 tgs/code/*.ipynb
+tgs/code/pred_initial*
