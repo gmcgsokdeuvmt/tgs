@@ -97,9 +97,9 @@ class Trainer:
             print('Epoch: {}. \t Train Loss: {:.4g}. \t Val Loss: {:.4g}'.format(epoch, train_loss, val_loss))
             print('Epoch: {}. \t Train Acc : {:.4g}. \t Val Acc : {:.4g}'.format(epoch, train_acc, val_acc))
             gc.collect()
-            save_path = self.checkpoints.format(epoch)
-            torch.save(model.state_dict(), save_path)
-            print('  Save model: {}'.format(save_path))
+            #save_path = self.checkpoints.format(epoch)
+            #torch.save(model.state_dict(), save_path)
+            #print('  Save model: {}'.format(save_path))
 
             print(
                 epoch,
