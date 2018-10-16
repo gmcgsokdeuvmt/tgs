@@ -124,28 +124,6 @@ class SERefineRes34Unet(nn.Module):
             (out_d1, 16),
             (out_d1, 8)
             )       
-        bilinear = 'bilinear'
-        self.refine_net.mrf.resolve0 =  nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
-        self.refine_net.mrf.resolve1 =  nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
-            nn.Upsample(scale_factor=2, mode=bilinear)
-        )
-        self.refine_net.mrf.resolve2 =  nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
-            nn.Upsample(scale_factor=4, mode=bilinear)
-        )
-        self.refine_net.mrf.resolve3 =  nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
-            nn.Upsample(scale_factor=8, mode=bilinear)
-        )
-        self.refine_net.mrf.resolve4 =  nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
-            nn.Upsample(scale_factor=16, mode=bilinear)
-        )
-        self.refine_net.mrf.resolve5 =  nn.Sequential(
-            nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
-            nn.Upsample(scale_factor=32, mode=bilinear)
-        )
 
         self.rcu2 = nn.Sequential(
             ResidualConvUnit(out_d1),
