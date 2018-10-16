@@ -124,7 +124,7 @@ class SERefineRes34Unet(nn.Module):
             (out_d1, 16),
             (out_d1, 8)
             )       
-
+        bilinear = 'bilinear'
         self.refine_net.mrf.resolve0 =  nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
         self.refine_net.mrf.resolve1 =  nn.Sequential(
             nn.Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
